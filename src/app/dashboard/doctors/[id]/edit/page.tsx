@@ -1,0 +1,530 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import DashboardLayout from '@/components/DashboardLayout'
+import { FiUpload, FiArrowLeft } from 'react-icons/fi'
+import Link from 'next/link'
+
+interface Doctor {
+  id: string
+  full_name: string
+  specialist: string
+  education: string
+  experience: string
+  schedule: any
+  str_number: string
+  sip_number: string
+  phone_number: string
+  email: string
+  gender: 'male' | 'female'
+  years_of_practice: number
+  clinic_room: string
+  status: 'active' | 'inactive'
+  photo_url: string
+}
+
+export default function EditDoctorPage() {
+  const router = useRouter()
+  const params = useParams()
+  const doctorId = params.id as string
+  
+  const [loading, setLoading] = useState(false)
+  const [fetchLoading, setFetchLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  
+  const [formData, setFormData] = useState({
+    full_name: '',
+    specialist: '',
+    education: '',
+    experience: '',
+    str_number: '',
+    sip_number: '',
+    phone_number: '',
+    email: '',
+    gender: 'male',
+    years_of_practice: '',
+    clinic_room: '',
+    status: 'active',
+    photo_url: '',
+    schedule: {
+      monday: { start: '', end: '' },
+      tuesday: { start: '', end: '' },
+      wednesday: { start: '', end: '' },
+      thursday: { start: '', end: '' },
+      friday: { start: '', end: '' },
+      saturday: { start: '', end: '' },
+      sunday: { start: '', end: '' }
+    }
+  })
+
+  useEffect(() => {
+    fetchDoctor()
+  }, [doctorId])
+
+  const fetchDoctor = async () => {
+    try {
+      const response = await fetch(`/api/doctors/${doctorId}`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const result = await response.json()
+
+      if (response.ok) {
+        const doctor = result.data
+        setFormData({
+          full_name: doctor.full_name || '',
+          specialist: doctor.specialist || '',
+          education: doctor.education || '',
+          experience: doctor.experience || '',
+          str_number: doctor.str_number || '',
+          sip_number: doctor.sip_number || '',
+          phone_number: doctor.phone_number || '',
+          email: doctor.email || '',
+          gender: doctor.gender || 'male',
+          years_of_practice: doctor.years_of_practice?.toString() || '',
+          clinic_room: doctor.clinic_room || '',
+          status: doctor.status || 'active',
+          photo_url: doctor.photo_url || '',
+          schedule: doctor.schedule || {
+            monday: { start: '', end: '' },
+            tuesday: { start: '', end: '' },
+            wednesday: { start: '', end: '' },
+            thursday: { start: '', end: '' },
+            friday: { start: '', end: '' },
+            saturday: { start: '', end: '' },
+            sunday: { start: '', end: '' }
+          }
+        })
+      } else {
+        setError(result.error)
+      }
+    } catch {
+      setError('Failed to fetch doctor')
+    } finally {
+      setFetchLoading(false)
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'years_of_practice' ? parseInt(value) || 0 : value
+    }))
+  }
+
+  const handleScheduleChange = (day: string, field: 'start' | 'end', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      schedule: {
+        ...prev.schedule,
+        [day]: {
+          ...prev.schedule[day as keyof typeof prev.schedule],
+          [field]: value
+        }
+      }
+    }))
+  }
+
+  const toggleDayOff = (day: string) => {
+    const currentSchedule = formData.schedule[day as keyof typeof formData.schedule]
+    setFormData(prev => ({
+      ...prev,
+      schedule: {
+        ...prev.schedule,
+        [day]: currentSchedule === null || currentSchedule?.start === 'OFF'
+          ? { start: '', end: '' }
+          : { start: 'OFF', end: 'OFF' }
+      }
+    }))
+  }
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingPhoto(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+      formDataUpload.append('folder', 'doctors')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        setFormData(prev => ({ ...prev, photo_url: result.data.url }))
+      } else {
+        setError(result.error)
+      }
+    } catch {
+      setError('Failed to upload photo')
+    } finally {
+      setUploadingPhoto(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const scheduleData = Object.fromEntries(
+        Object.entries(formData.schedule).map(([day, times]) => [
+          day,
+          times === null || times.start === 'OFF' || times.start === '' ? null : times
+        ])
+      )
+
+      const submitData = {
+        ...formData,
+        schedule: scheduleData
+      }
+
+      const response = await fetch(`/api/doctors/${doctorId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submitData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        router.push('/dashboard/doctors')
+      } else {
+        setError(result.error)
+      }
+    } catch {
+      setError('Failed to update doctor')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (fetchLoading) {
+    return (
+      <DashboardLayout>
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i}>
+                  <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  return (
+    <DashboardLayout>
+      <div className="mb-6">
+        <Link
+          href="/dashboard/doctors"
+          className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+        >
+          <FiArrowLeft className="w-4 h-4 mr-2" />
+          Back to Doctors
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900">Edit Doctor</h1>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
+
+      <div className="bg-white rounded-lg shadow mb-8">
+        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Specialist *
+              </label>
+              <input
+                type="text"
+                name="specialist"
+                value={formData.specialist}
+                onChange={handleInputChange}
+                required
+                placeholder="e.g., Cardiologist, Dentist"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone_number"
+                value={formData.phone_number}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Years of Practice
+              </label>
+              <input
+                type="number"
+                name="years_of_practice"
+                value={formData.years_of_practice}
+                onChange={handleInputChange}
+                min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                STR Number
+              </label>
+              <input
+                type="text"
+                name="str_number"
+                value={formData.str_number}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                SIP Number
+              </label>
+              <input
+                type="text"
+                name="sip_number"
+                value={formData.sip_number}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Clinic Room
+              </label>
+              <input
+                type="text"
+                name="clinic_room"
+                value={formData.clinic_room}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Education
+            </label>
+            <textarea
+              name="education"
+              value={formData.education}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Experience
+            </label>
+            <textarea
+              name="experience"
+              value={formData.experience}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Photo
+            </label>
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div className="space-y-1 text-center">
+                {formData.photo_url ? (
+                  <div className="mb-4">
+                    <img
+                      src={formData.photo_url}
+                      alt="Doctor photo"
+                      className="w-20 h-20 rounded-full mx-auto object-cover"
+                    />
+                  </div>
+                ) : (
+                  <FiUpload className="mx-auto h-12 w-12 text-gray-400" />
+                )}
+                <div className="flex text-sm text-gray-600">
+                  <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                    <span>{uploadingPhoto ? 'Uploading...' : 'Upload a photo'}</span>
+                    <input
+                      type="file"
+                      className="sr-only"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      disabled={uploadingPhoto}
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 pt-8">
+            <label className="block text-sm font-medium text-gray-700 mb-6">
+              Weekly Schedule
+            </label>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {Object.entries(formData.schedule).map(([day, times]) => {
+                const isDayOff = times === null || times.start === 'OFF'
+                return (
+                  <div key={day} className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-4 border border-gray-200 rounded-lg">
+                    <div className="w-24 text-sm font-medium text-gray-700 capitalize flex-shrink-0">
+                      {day}
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={isDayOff}
+                        onChange={() => toggleDayOff(day)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label className="text-sm text-gray-600">Day Off</label>
+                    </div>
+
+                    {!isDayOff && (
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <label className="text-sm text-gray-600 w-10">Start:</label>
+                          <input
+                            type="time"
+                            value={times?.start || ''}
+                            onChange={(e) => handleScheduleChange(day, 'start', e.target.value)}
+                            className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <label className="text-sm text-gray-600 w-10">End:</label>
+                          <input
+                            type="time"
+                            value={times?.end || ''}
+                            onChange={(e) => handleScheduleChange(day, 'end', e.target.value)}
+                            className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 pt-6 mt-8">
+            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+              <Link
+                href="/dashboard/doctors"
+                className="px-6 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-center"
+              >
+                Cancel
+              </Link>
+              <button
+                type="submit"
+                disabled={loading || uploadingPhoto}
+                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                {loading ? 'Updating...' : 'Update Doctor'}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </DashboardLayout>
+  )
+}
