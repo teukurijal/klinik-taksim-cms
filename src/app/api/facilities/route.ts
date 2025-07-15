@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 
 export async function GET() {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createRouteHandlerClient({ cookies: await cookies })
 
     // Facility photos are publicly readable - no auth check required for GET
     const { data, error } = await supabase
@@ -24,7 +24,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createRouteHandlerClient({ cookies: await cookies })
 
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {

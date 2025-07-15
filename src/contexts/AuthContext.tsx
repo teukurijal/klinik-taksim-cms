@@ -1,20 +1,25 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { User } from '@supabase/supabase-js'
+import { User, AuthError, Session } from '@supabase/supabase-js'
 import { createBrowserClient } from '@supabase/ssr'
+
+interface SignInResponse {
+  user: User | null
+  session: Session | null
+}
 
 interface AuthContextType {
   user: User | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<{ data: any; error: any }>
+  signIn: (email: string, password: string) => Promise<{ data: SignInResponse; error: AuthError | null }>
   signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signIn: async () => ({ data: null, error: null }),
+  signIn: async () => ({ data: { user: null, session: null }, error: null }),
   signOut: async () => {},
 })
 

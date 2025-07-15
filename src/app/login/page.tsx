@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { FiEye, FiEyeOff, FiUser, FiLock } from 'react-icons/fi'
 
@@ -13,7 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   
   const { signIn } = useAuth()
-  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,7 +28,7 @@ export default function LoginPage() {
         // Don't manually redirect - let the auth state change handler do it
         // This ensures proper session sync with middleware
       }
-    } catch (_err) {
+    } catch {
       setError('An unexpected error occurred')
       setLoading(false)
     }

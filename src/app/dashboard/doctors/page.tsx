@@ -28,7 +28,7 @@ export default function DoctorsPage() {
     if (!schedule) return 'No schedule set'
     
     const activeDays = Object.entries(schedule)
-      .filter(([_, times]) => times && times.start !== 'OFF')
+      .filter(([, times]) => times && times.start !== 'OFF')
       .map(([day, times]) => {
         const dayName = day.charAt(0).toUpperCase() + day.slice(1, 3)
         return times ? `${dayName} ${times.start}-${times.end}` : ''

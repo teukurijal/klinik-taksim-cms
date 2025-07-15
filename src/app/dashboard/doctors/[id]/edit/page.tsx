@@ -6,22 +6,13 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiArrowLeft } from 'react-icons/fi'
 import Link from 'next/link'
 
-interface Doctor {
-  id: string
-  full_name: string
-  specialist: string
-  education: string
-  experience: string
-  schedule: any
-  str_number: string
-  sip_number: string
-  phone_number: string
-  email: string
-  gender: 'male' | 'female'
-  years_of_practice: number
-  clinic_room: string
-  status: 'active' | 'inactive'
-  photo_url: string
+interface ScheduleTime {
+  start: string
+  end: string
+}
+
+interface DoctorSchedule {
+  [key: string]: ScheduleTime | null
 }
 
 export default function EditDoctorPage() {
@@ -56,7 +47,7 @@ export default function EditDoctorPage() {
       friday: { start: '', end: '' },
       saturday: { start: '', end: '' },
       sunday: { start: '', end: '' }
-    }
+    } as DoctorSchedule
   })
 
   useEffect(() => {
@@ -97,7 +88,7 @@ export default function EditDoctorPage() {
             friday: { start: '', end: '' },
             saturday: { start: '', end: '' },
             sunday: { start: '', end: '' }
-          }
+          } as DoctorSchedule
         })
       } else {
         setError(result.error)
@@ -123,7 +114,8 @@ export default function EditDoctorPage() {
       schedule: {
         ...prev.schedule,
         [day]: {
-          ...prev.schedule[day as keyof typeof prev.schedule],
+          start: prev.schedule[day as keyof typeof prev.schedule]?.start || '',
+          end: prev.schedule[day as keyof typeof prev.schedule]?.end || '',
           [field]: value
         }
       }

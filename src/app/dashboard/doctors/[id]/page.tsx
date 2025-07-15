@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
-import { FiArrowLeft, FiEdit, FiClock, FiPhone, FiMail, FiMapPin, FiUser, FiCalendar } from 'react-icons/fi'
+import { FiArrowLeft, FiEdit, FiPhone, FiMail, FiMapPin, FiUser, FiCalendar } from 'react-icons/fi'
 import Link from 'next/link'
 
 interface Doctor {
@@ -12,7 +12,7 @@ interface Doctor {
   specialist: string
   education: string
   experience: string
-  schedule: any
+  schedule: { [key: string]: { start: string; end: string } | null }
   str_number: string
   sip_number: string
   phone_number: string
@@ -59,7 +59,7 @@ export default function ViewDoctorPage() {
     }
   }
 
-  const formatSchedule = (schedule: any) => {
+  const formatSchedule = (schedule: { [key: string]: { start: string; end: string } | null }) => {
     if (!schedule) return 'No schedule set'
     
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
