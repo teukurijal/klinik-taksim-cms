@@ -14,12 +14,32 @@ interface Doctor {
   email?: string
   photo_url?: string
   created_at: string
+  schedule?: {
+    [key: string]: { start: string; end: string } | null
+  }
 }
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const formatSchedule = (schedule?: { [key: string]: { start: string; end: string } | null }) => {
+    if (!schedule) return 'No schedule set'
+    
+    const activeDays = Object.entries(schedule)
+      .filter(([_, times]) => times && times.start !== 'OFF')
+      .map(([day, times]) => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1, 3)
+        return times ? `${dayName} ${times.start}-${times.end}` : ''
+      })
+      .filter(Boolean)
+    
+    if (activeDays.length === 0) return 'No active days'
+    if (activeDays.length > 3) return `${activeDays.slice(0, 2).join(', ')}, +${activeDays.length - 2} more`
+    
+    return activeDays.join(', ')
+  }
 
   useEffect(() => {
     fetchDoctors()
@@ -127,6 +147,9 @@ export default function DoctorsPage() {
                     Contact
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Schedule
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -167,6 +190,11 @@ export default function DoctorsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{doctor.phone_number}</div>
                       <div className="text-sm text-gray-500">{doctor.email}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">
+                        {formatSchedule(doctor.schedule)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { supabase } from '@/lib/supabase'
 import { FiUsers, FiTag, FiCamera, FiMessageSquare, FiHelpCircle, FiImage } from 'react-icons/fi'
@@ -15,6 +16,7 @@ interface Stats {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [stats, setStats] = useState<Stats>({
     doctors: 0,
     promos: 0,
@@ -60,6 +62,10 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleQuickAction = (path: string) => {
+    router.push(path)
   }
 
   const statCards = [
@@ -155,15 +161,24 @@ export default function DashboardPage() {
       <div className="mt-8 bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+          <button 
+            onClick={() => handleQuickAction('/dashboard/doctors/create')}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+          >
             <h3 className="font-medium text-gray-900">Add New Doctor</h3>
             <p className="text-sm text-gray-600 mt-1">Create a new doctor profile</p>
           </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+          <button 
+            onClick={() => handleQuickAction('/dashboard/promos/create')}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+          >
             <h3 className="font-medium text-gray-900">Create Promo</h3>
             <p className="text-sm text-gray-600 mt-1">Add a new promotional content</p>
           </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+          <button 
+            onClick={() => handleQuickAction('/dashboard/facilities')}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+          >
             <h3 className="font-medium text-gray-900">Upload Facility Photo</h3>
             <p className="text-sm text-gray-600 mt-1">Add new facility images</p>
           </button>
