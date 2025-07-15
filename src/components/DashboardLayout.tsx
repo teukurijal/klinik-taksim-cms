@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import Image from 'next/image'
 import {
   FiHome,
   FiUsers,
@@ -68,7 +69,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         }`}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-gray-900">Taksim Medika</h1>
+          <div className="flex items-center space-x-3">
+            <Image 
+              src="/images/logo_icon.png" 
+              alt="Klinik Taksim Medika Logo" 
+              width={32} 
+              height={32}
+              className="w-8 h-8 object-contain"
+            />
+            <h1 className="text-xl font-bold text-gray-900">Taksim Medika</h1>
+          </div>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-gray-400 hover:text-gray-600"

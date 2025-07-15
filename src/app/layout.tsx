@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Klinik Taksim Medika - Admin Portal",
   description: "Content Management System for Klinik Taksim Medika",
+  // icons: {
+  //   icon: "public/favicon.ico",
+  // },
 };
 
 export default function RootLayout({
@@ -25,6 +28,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

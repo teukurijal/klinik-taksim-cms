@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { FiEye, FiEyeOff, FiUser, FiLock } from 'react-icons/fi'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -38,8 +39,12 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <FiUser className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 mx-auto mb-4">
+            <img 
+              src="/images/logo_icon.png" 
+              alt="Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Klinik Taksim Medika</h1>
           <p className="text-gray-600 mt-2">Admin Portal</p>
