@@ -6,19 +6,19 @@ import { DoctorRepository } from '../../../domain/repositories/DoctorRepository'
 import { NotFoundError, ValidationError } from '../../../../shared/errors/DomainError'
 
 export interface UpdateDoctorRequest {
-  fullName?: string
+  full_name?: string
   specialist?: string
-  photoUrl?: string
+  photo_url?: string
   education?: string
   experience?: string
   schedule?: DoctorSchedule
-  strNumber?: string
-  sipNumber?: string
-  phoneNumber?: string
+  str_number?: string
+  sip_number?: string
+  phone_number?: string
   email?: string
   gender?: Gender
-  yearsOfPractice?: number
-  clinicRoom?: string
+  years_of_practice?: number
+  clinic_room?: string
 }
 
 export class UpdateDoctorUseCase {
@@ -40,14 +40,23 @@ export class UpdateDoctorUseCase {
         email = new Email(request.email)
       }
       
-      if (request.phoneNumber) {
-        phoneNumber = new PhoneNumber(request.phoneNumber)
+      if (request.phone_number) {
+        phoneNumber = new PhoneNumber(request.phone_number)
       }
 
       doctor.updateProfile({
-        ...request,
+        fullName: request.full_name,
+        specialist: request.specialist,
+        photoUrl: request.photo_url,
+        education: request.education,
+        experience: request.experience,
+        strNumber: request.str_number,
+        sipNumber: request.sip_number,
+        phoneNumber,
         email,
-        phoneNumber
+        gender: request.gender,
+        yearsOfPractice: request.years_of_practice,
+        clinicRoom: request.clinic_room
       })
 
       if (request.schedule) {

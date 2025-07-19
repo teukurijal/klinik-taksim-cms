@@ -6,19 +6,19 @@ import { DoctorRepository } from '../../../domain/repositories/DoctorRepository'
 import { ValidationError } from '../../../../shared/errors/DomainError'
 
 export interface CreateDoctorRequest {
-  fullName: string
+  full_name: string
   specialist: string
-  photoUrl?: string
+  photo_url?: string
   education?: string
   experience?: string
   schedule?: DoctorSchedule
-  strNumber?: string
-  sipNumber?: string
-  phoneNumber?: string
+  str_number?: string
+  sip_number?: string
+  phone_number?: string
   email?: string
   gender?: Gender
-  yearsOfPractice?: number
-  clinicRoom?: string
+  years_of_practice?: number
+  clinic_room?: string
 }
 
 export class CreateDoctorUseCase {
@@ -35,26 +35,26 @@ export class CreateDoctorUseCase {
         email = new Email(request.email)
       }
       
-      if (request.phoneNumber) {
-        phoneNumber = new PhoneNumber(request.phoneNumber)
+      if (request.phone_number) {
+        phoneNumber = new PhoneNumber(request.phone_number)
       }
 
       const doctor = new Doctor(
         id,
-        request.fullName,
+        request.full_name,
         request.specialist,
         DoctorStatus.ACTIVE,
-        request.photoUrl,
+        request.photo_url,
         request.education,
         request.experience,
         request.schedule,
-        request.strNumber,
-        request.sipNumber,
+        request.str_number,
+        request.sip_number,
         phoneNumber,
         email,
         request.gender,
-        request.yearsOfPractice,
-        request.clinicRoom
+        request.years_of_practice,
+        request.clinic_room
       )
 
       return await this.doctorRepository.save(doctor)
