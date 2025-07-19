@@ -40,12 +40,12 @@ export class Doctor {
     private createdAt: Date = new Date(),
     private updatedAt: Date = new Date()
   ) {
-    if (!fullName || fullName.trim().length === 0) {
-      throw new Error('Doctor full name is required')
-    }
-    if (!specialist || specialist.trim().length === 0) {
-      throw new Error('Doctor specialist is required')
-    }
+    // if (!fullName || fullName.trim().length === 0) {
+    //   throw new Error('Doctor full name is required')
+    // }
+    // if (!specialist || specialist.trim().length === 0) {
+    //   throw new Error('Doctor specialist is required')
+    // }
   }
 
   getId(): EntityId {

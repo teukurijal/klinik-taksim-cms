@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User, AuthError, Session } from '@supabase/supabase-js'
 import { createBrowserClient } from '@supabase/ssr'
+import { setSecureTokenCookie, getTokenFromCookie, removeTokenCookie } from '@/utils/auth'
 
 interface SignInResponse {
   user: User | null
@@ -44,7 +45,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Get initial session
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
+      
+      // If no session but we have a token in cookie, try to restore session
+      if (!session) {
+        const tokenFromCookie = getTokenFromCookie()
+        if (tokenFromCookie) {
+          // Try to get user info with the stored token
+          const { data: { user } } = await supabase.auth.getUser(tokenFromCookie)
+          if (user) {
+            setUser(user)
+          } else {
+            // Token is invalid, remove it
+            removeTokenCookie()
+          }
+        }
+      } else {
+        setUser(session.user)
+        // Update cookie with fresh token
+        if (session.access_token) {
+          setSecureTokenCookie(session.access_token)
+        }
+      }
+      
       setLoading(false)
     }
 
@@ -52,7 +74,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_, session) => {
+        if (session?.access_token) {
+          setSecureTokenCookie(session.access_token)
+        } else {
+          removeTokenCookie()
+        }
         setUser(session?.user ?? null)
         setLoading(false)
       }
@@ -66,10 +93,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       email,
       password,
     })
+    
+    // Store encrypted token in secure cookie on successful login
+    if (data.session?.access_token && !error) {
+      setSecureTokenCookie(data.session.access_token)
+    }
+    
     return { data, error }
   }
 
   const signOut = async () => {
+    removeTokenCookie()
     await supabase.auth.signOut()
     window.location.href = '/login'
   }

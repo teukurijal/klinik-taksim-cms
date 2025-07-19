@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi'
+import { apiGet, apiDelete } from '@/utils/api'
 
 interface Doctor {
   id: string
@@ -48,12 +49,7 @@ export default function DoctorsPage() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch('/api/doctors', {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await apiGet('/api/doctors')
       const result = await response.json()
 
       if (response.ok) {
@@ -72,13 +68,7 @@ export default function DoctorsPage() {
     if (!confirm('Are you sure you want to delete this doctor?')) return
 
     try {
-      const response = await fetch(`/api/doctors/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await apiDelete(`/api/doctors/${id}`)
 
       if (response.ok) {
         setDoctors(doctors.filter(doctor => doctor.id !== id))

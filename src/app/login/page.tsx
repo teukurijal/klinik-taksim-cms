@@ -4,13 +4,15 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { FiEye, FiEyeOff, FiUser, FiLock } from 'react-icons/fi'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState('');
+  const router = useRouter();
   
   const { signIn } = useAuth()
 
@@ -26,6 +28,7 @@ export default function LoginPage() {
         setError(error.message)
         setLoading(false)
       } else if (data.user) {
+        router.push('/dashboard')
         // Don't manually redirect - let the auth state change handler do it
         // This ensures proper session sync with middleware
       }

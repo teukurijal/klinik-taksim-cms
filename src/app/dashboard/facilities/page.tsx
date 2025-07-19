@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiTrash2, FiImage } from 'react-icons/fi'
 import Image from 'next/image'
+import { apiGet, apiPost, apiDelete, apiUpload } from '@/utils/api'
 
 interface FacilityPhoto {
   id: string
@@ -25,7 +26,7 @@ export default function FacilitiesPage() {
 
   const fetchFacilities = async () => {
     try {
-      const response = await fetch('/api/facilities')
+      const response = await apiGet('/api/facilities')
       const result = await response.json()
 
       if (response.ok) {
@@ -52,23 +53,14 @@ export default function FacilitiesPage() {
       formDataUpload.append('file', file)
       formDataUpload.append('folder', 'facilities')
 
-      const uploadResponse = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload,
-      })
+      const uploadResponse = await apiUpload('/api/upload', formDataUpload)
 
       const uploadResult = await uploadResponse.json()
 
       if (uploadResponse.ok) {
-        const response = await fetch('/api/facilities', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            image_url: uploadResult.data.url,
-            title: file.name.split('.')[0],
-          }),
+        const response = await apiPost('/api/facilities', {
+          image_url: uploadResult.data.url,
+          title: file.name.split('.')[0],
         })
 
         const result = await response.json()
@@ -92,9 +84,7 @@ export default function FacilitiesPage() {
     if (!confirm('Are you sure you want to delete this facility photo?')) return
 
     try {
-      const response = await fetch(`/api/facilities/${id}`, {
-        method: 'DELETE',
-      })
+      const response = await apiDelete(`/api/facilities/${id}`)
 
       if (response.ok) {
         setFacilities(facilities.filter(facility => facility.id !== id))
