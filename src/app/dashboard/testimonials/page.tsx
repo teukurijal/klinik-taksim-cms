@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiPlus, FiEdit, FiTrash2, FiUser } from 'react-icons/fi'
-import Image from 'next/image'
 
 interface Testimonial {
   id: string
@@ -103,12 +102,12 @@ export default function TestimonialsPage() {
 
   const editTestimonial = (testimonial: Testimonial) => {
     setFormData({
-      name: testimonial.name,
-      testimonial_text: testimonial.testimonial_text,
-      patient_category: testimonial.patient_category || '',
-      photo_url: testimonial.photo_url || ''
+      name: testimonial?.name,
+      testimonial_text: testimonial?.testimonial_text,
+      patient_category: testimonial?.patient_category || '',
+      photo_url: testimonial?.photo_url || ''
     })
-    setEditingId(testimonial.id)
+    setEditingId(testimonial?.id)
     setShowForm(true)
   }
 
@@ -159,7 +158,7 @@ export default function TestimonialsPage() {
                 type="text"
                 placeholder="Patient Name *"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -167,14 +166,14 @@ export default function TestimonialsPage() {
                 type="text"
                 placeholder="Patient Category (optional)"
                 value={formData.patient_category}
-                onChange={(e) => setFormData({...formData, patient_category: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, patient_category: e.target.value })}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <textarea
               placeholder="Testimonial text *"
               value={formData.testimonial_text}
-              onChange={(e) => setFormData({...formData, testimonial_text: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, testimonial_text: e.target.value })}
               required
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -192,27 +191,23 @@ export default function TestimonialsPage() {
       )}
 
       <div className="space-y-4">
-        {testimonials.map((testimonial) => (
-          <div key={testimonial.id} className="bg-white rounded-lg shadow p-6">
+        {testimonials.map((testimonial, idx) => (
+          <div key={idx.toString()} className="bg-white rounded-lg shadow p-6">
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
-                  {testimonial.photo_url ? (
-                    <Image src={testimonial.photo_url} alt={testimonial.name} width={48} height={48} className="w-12 h-12 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                      <FiUser className="w-6 h-6 text-gray-600" />
-                    </div>
-                  )}
+                  <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                    <FiUser className="w-6 h-6 text-gray-600" />
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900">{testimonial.name}</h3>
-                  {testimonial.patient_category && (
-                    <p className="text-sm text-blue-600 mb-2">{testimonial.patient_category}</p>
+                  <h3 className="text-lg font-semibold text-gray-900">{testimonial?.name}</h3>
+                  {testimonial?.patient_category && (
+                    <p className="text-sm text-blue-600 mb-2">{testimonial?.patient_category}</p>
                   )}
-                  <p className="text-gray-700 leading-relaxed">{testimonial.testimonial_text}</p>
+                  <p className="text-gray-700 leading-relaxed">{testimonial?.testimonial_text}</p>
                   <p className="text-xs text-gray-400 mt-2">
-                    {new Date(testimonial.created_at).toLocaleDateString()}
+                    {new Date(testimonial?.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -220,7 +215,7 @@ export default function TestimonialsPage() {
                 <button onClick={() => editTestimonial(testimonial)} className="text-indigo-600 hover:text-indigo-900 p-1">
                   <FiEdit className="w-4 h-4" />
                 </button>
-                <button onClick={() => deleteTestimonial(testimonial.id)} className="text-red-600 hover:text-red-900 p-1">
+                <button onClick={() => deleteTestimonial(testimonial?.id)} className="text-red-600 hover:text-red-900 p-1">
                   <FiTrash2 className="w-4 h-4" />
                 </button>
               </div>

@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Container } from '../../../../shared/di/Container'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const container = Container.getInstance()
+    const controller = container.getTestimonialController()
+    
+    return await controller.getById(id)
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
 
 export async function PUT(
   request: NextRequest,
@@ -32,19 +48,10 @@ export async function PUT(
     }
 
     const { id } = await params
-    const body = await request.json()
+    const container = Container.getInstance()
+    const controller = container.getTestimonialController()
     
-    const { data, error } = await supabase
-      .from('testimonials')
-      .update(body)
-      .eq('id', id)
-      .select()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ data })
+    return await controller.update(id, request)
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -80,16 +87,10 @@ export async function DELETE(
     }
 
     const { id } = await params
-    const { error } = await supabase
-      .from('testimonials')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true })
+    const container = Container.getInstance()
+    const controller = container.getTestimonialController()
+    
+    return await controller.delete(id)
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

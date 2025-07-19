@@ -20,6 +20,9 @@ export class PromoController {
       if (body.end_date) {
         body.endDate = new Date(body.end_date)
       }
+      if (body.image_url) {
+        body.imageUrl = body.image_url
+      }
 
       const useCase = new CreatePromoUseCase(this.promoRepository)
       const promo = await useCase.execute(body)
@@ -82,6 +85,9 @@ export class PromoController {
       }
       if (body.end_date) {
         body.endDate = new Date(body.end_date)
+      }
+      if (body.image_url) {
+        body.imageUrl = body.image_url
       }
 
       const useCase = new UpdatePromoUseCase(this.promoRepository)

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
-import { FiUpload, FiTrash2, FiImage } from 'react-icons/fi'
+import { FiTrash2, FiImage, FiPlus, FiEdit, FiEye } from 'react-icons/fi'
 import Image from 'next/image'
-import { apiGet, apiPost, apiDelete, apiUpload } from '@/utils/api'
+import Link from 'next/link'
+import { apiGet, apiDelete } from '@/utils/api'
 
 interface FacilityPhoto {
   id: string
@@ -18,7 +19,6 @@ export default function FacilitiesPage() {
   const [facilities, setFacilities] = useState<FacilityPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     fetchFacilities()
@@ -41,44 +41,6 @@ export default function FacilitiesPage() {
     }
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploading(true)
-    setError('')
-
-    try {
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('folder', 'facilities')
-
-      const uploadResponse = await apiUpload('/api/upload', formDataUpload)
-
-      const uploadResult = await uploadResponse.json()
-
-      if (uploadResponse.ok) {
-        const response = await apiPost('/api/facilities', {
-          image_url: uploadResult.data.url,
-          title: file.name.split('.')[0],
-        })
-
-        const result = await response.json()
-
-        if (response.ok) {
-          setFacilities([result.data[0], ...facilities])
-        } else {
-          setError(result.error)
-        }
-      } else {
-        setError(uploadResult.error)
-      }
-    } catch {
-      setError('Failed to upload image')
-    } finally {
-      setUploading(false)
-    }
-  }
 
   const deleteFacility = async (id: string) => {
     if (!confirm('Are you sure you want to delete this facility photo?')) return
@@ -121,8 +83,19 @@ export default function FacilitiesPage() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Facility Photos</h1>
-        <p className="text-gray-600 mt-2">Manage your clinic facility images</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Facility Photos</h1>
+            <p className="text-gray-600 mt-2">Manage your clinic facility images</p>
+          </div>
+          <Link
+            href="/dashboard/facilities/create"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
+          >
+            <FiPlus className="w-4 h-4 mr-2" />
+            Add Photo
+          </Link>
+        </div>
       </div>
 
       {error && (
@@ -131,56 +104,23 @@ export default function FacilitiesPage() {
         </div>
       )}
 
-      <div className="mb-6">
-        <div className="max-w-lg">
-          <label className="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
-            <span className="flex items-center space-x-2">
-              <FiUpload className="w-6 h-6 text-gray-600" />
-              <span className="font-medium text-gray-600">
-                {uploading ? 'Uploading...' : 'Drop files to upload, or browse'}
-              </span>
-            </span>
-            <input
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={handleImageUpload}
-              disabled={uploading}
-            />
-          </label>
-        </div>
-      </div>
-
       {facilities.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <FiImage className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <div className="text-gray-500 mb-4">No facility photos found</div>
-          <p className="text-sm text-gray-400">Upload your first facility photo above</p>
+          <p className="text-sm text-gray-400">Click &quot;Add Photo&quot; to upload your first facility photo</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {facilities.map((facility) => (
             <div key={facility.id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-              <div className="relative group">
-                <Image
-                  src={facility.image_url}
-                  alt={facility.title || 'Facility photo'}
-                  width={400}
-                  height={192}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded-t-lg">
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => deleteFacility(facility.id)}
-                      className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700"
-                      title="Delete photo"
-                    >
-                      <FiTrash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <Image
+                src={facility.image_url}
+                alt={facility.title || 'Facility photo'}
+                width={400}
+                height={192}
+                className="w-full h-48 object-cover rounded-t-lg"
+              />
               
               <div className="p-4">
                 {facility.title && (
@@ -193,9 +133,36 @@ export default function FacilitiesPage() {
                     {facility.description}
                   </p>
                 )}
-                <p className="text-xs text-gray-400">
-                  {new Date(facility.created_at).toLocaleDateString()}
-                </p>
+                
+                <div className="flex justify-between items-center mt-3">
+                  <div className="flex space-x-2">
+                    <Link
+                      href={`/dashboard/facilities/${facility.id}`}
+                      className="text-blue-600 hover:text-blue-900 p-1"
+                      title="View photo"
+                    >
+                      <FiEye className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      href={`/dashboard/facilities/${facility.id}/edit`}
+                      className="text-indigo-600 hover:text-indigo-900 p-1"
+                      title="Edit photo"
+                    >
+                      <FiEdit className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() => deleteFacility(facility.id)}
+                      className="text-red-600 hover:text-red-900 p-1"
+                      title="Delete photo"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <span className="text-xs text-gray-400">
+                    {new Date(facility.created_at).toLocaleDateString()}
+                  </span>
+                </div>
               </div>
             </div>
           ))}

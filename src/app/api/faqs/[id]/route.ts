@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Container } from '../../../../shared/di/Container'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -7,38 +8,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-          set(name: string, value: string, options) {
-            cookieStore.set({ name, value, ...options })
-          },
-          remove(name: string, options) {
-            cookieStore.set({ name, value: '', ...options })
-          },
-        },
-      }
-    )
-
-    // FAQs are publicly readable - no auth check required for GET
     const { id } = await params
-    const { data, error } = await supabase
-      .from('faqs')
-      .select('*')
-      .eq('id', id)
-      .single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ data })
+    const container = Container.getInstance()
+    const controller = container.getFAQController()
+    
+    return await controller.getById(id)
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -74,19 +48,10 @@ export async function PUT(
     }
 
     const { id } = await params
-    const body = await request.json()
+    const container = Container.getInstance()
+    const controller = container.getFAQController()
     
-    const { data, error } = await supabase
-      .from('faqs')
-      .update(body)
-      .eq('id', id)
-      .select()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ data })
+    return await controller.update(id, request)
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -122,16 +87,10 @@ export async function DELETE(
     }
 
     const { id } = await params
-    const { error } = await supabase
-      .from('faqs')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true })
+    const container = Container.getInstance()
+    const controller = container.getFAQController()
+    
+    return await controller.delete(id)
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

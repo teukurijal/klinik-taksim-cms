@@ -13,12 +13,13 @@ import {
   FiCamera,
   FiMessageSquare,
   FiHelpCircle,
-  FiImage,
   FiSettings,
   FiLogOut,
   FiMenu,
   FiX,
 } from 'react-icons/fi'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 interface MenuItem {
   name: string
@@ -33,7 +34,7 @@ const menuItems: MenuItem[] = [
   { name: 'Facilities', href: '/dashboard/facilities', icon: FiCamera },
   { name: 'Testimonials', href: '/dashboard/testimonials', icon: FiMessageSquare },
   { name: 'FAQ', href: '/dashboard/faqs', icon: FiHelpCircle },
-  { name: 'Partners', href: '/dashboard/partners', icon: FiImage },
+  // { name: 'Partners', href: '/dashboard/partners', icon: FiImage },
   { name: 'Settings', href: '/dashboard/settings', icon: FiSettings },
 ]
 
@@ -53,7 +54,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-background">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -64,11 +65,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+        <div className="flex items-center justify-between h-16 px-6 border-b">
           <div className="flex items-center space-x-3">
             <Image 
               src="/images/logo_icon.png" 
@@ -77,14 +78,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               height={32}
               className="w-8 h-8 object-contain"
             />
-            <h1 className="text-xl font-bold text-gray-900">Taksim Medika</h1>
+            <h1 className="text-xl font-bold">Taksim Medika</h1>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-gray-600"
+            className="lg:hidden"
           >
-            <FiX className="w-6 h-6" />
-          </button>
+            <FiX className="w-4 h-4" />
+          </Button>
         </div>
 
         <nav className="mt-6 px-3">
@@ -94,57 +97,65 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               const isActive = pathname === item.href
 
               return (
-                <Link
+                <Button
                   key={item.name}
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 border-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                  variant={isActive ? "secondary" : "ghost"}
+                  className={`w-full justify-start ${
+                    isActive ? 'bg-primary/10 text-primary' : ''
                   }`}
+                  asChild
                 >
-                  <Icon className="w-5 h-5 mr-3" />
-                  {item.name}
-                </Link>
+                  <Link
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <Icon className="w-4 h-4 mr-3" />
+                    {item.name}
+                  </Link>
+                </Button>
               )
             })}
           </div>
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
           <div className="flex items-center mb-3">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <FiUsers className="w-4 h-4 text-blue-600" />
-            </div>
+            <Avatar className="w-8 h-8">
+              <AvatarFallback>
+                <FiUsers className="w-4 h-4" />
+              </AvatarFallback>
+            </Avatar>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">Admin</p>
-              <p className="text-xs text-gray-500">{user?.email}</p>
+              <p className="text-sm font-medium">Admin</p>
+              <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
             onClick={handleSignOut}
-            className="flex items-center w-full px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
           >
-            <FiLogOut className="w-5 h-5 mr-3" />
+            <FiLogOut className="w-4 h-4 mr-3" />
             Sign Out
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Main content */}
       <div className="flex-1 lg:ml-0 flex flex-col">
         {/* Top bar - Fixed */}
-        <div className="fixed top-0 right-0 left-0 lg:left-64 z-30 flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200 shadow-sm">
-          <button
+        <div className="fixed top-0 right-0 left-0 lg:left-64 z-30 flex items-center justify-between h-16 px-6 bg-background border-b shadow-sm">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setSidebarOpen(true)}
-            className="text-gray-400 hover:text-gray-600 lg:hidden"
+            className="lg:hidden"
           >
-            <FiMenu className="w-6 h-6" />
-          </button>
+            <FiMenu className="w-4 h-4" />
+          </Button>
 
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               Welcome back, Admin
             </span>
           </div>
