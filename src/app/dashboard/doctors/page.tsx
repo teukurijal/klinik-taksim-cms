@@ -145,9 +145,6 @@ export default function DoctorsPage() {
                     Specialist
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Schedule
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -189,10 +186,6 @@ export default function DoctorsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{doctor.specialist}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{doctor.phone_number}</div>
-                      <div className="text-sm text-gray-500">{doctor.email}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-900">

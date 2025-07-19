@@ -55,11 +55,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (event, session) => {
         setUser(session?.user ?? null)
         setLoading(false)
-        
-        // Force a page refresh after login to sync with middleware
-        if (event === 'SIGNED_IN') {
-          window.location.href = '/dashboard'
-        }
       }
     )
 

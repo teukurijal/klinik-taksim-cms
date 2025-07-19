@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
@@ -15,6 +16,12 @@ export async function POST(request: NextRequest) {
           },
         },
       }
+    )
+
+    // Create service role client for storage operations
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
     const { data: { session } } = await supabase.auth.getSession()
@@ -33,7 +40,7 @@ export async function POST(request: NextRequest) {
     const fileExt = file.name.split('.').pop()
     const fileName = `${folder}/${Date.now()}.${fileExt}`
 
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from('clinic-images')
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -44,7 +51,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = supabaseAdmin.storage
       .from('clinic-images')
       .getPublicUrl(data.path)
 
