@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import Link from 'next/link'
-import Image from 'next/image'
 import { FiPlus, FiEdit, FiTrash2, FiEye, FiCalendar } from 'react-icons/fi'
 
 interface Promo {
