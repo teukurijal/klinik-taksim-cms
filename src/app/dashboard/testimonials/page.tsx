@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiPlus, FiEdit, FiTrash2, FiUser } from 'react-icons/fi'
+import Image from 'next/image'
 
 interface Testimonial {
   id: string
@@ -197,7 +198,7 @@ export default function TestimonialsPage() {
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
                   {testimonial.photo_url ? (
-                    <img src={testimonial.photo_url} alt={testimonial.name} className="w-12 h-12 rounded-full object-cover" />
+                    <Image src={testimonial.photo_url} alt={testimonial.name} width={48} height={48} className="w-12 h-12 rounded-full object-cover" />
                   ) : (
                     <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                       <FiUser className="w-6 h-6 text-gray-600" />

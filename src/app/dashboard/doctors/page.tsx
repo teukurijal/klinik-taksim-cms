@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import Link from 'next/link'
+import Image from 'next/image'
 import { FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi'
 
 interface Doctor {
@@ -164,10 +165,12 @@ export default function DoctorsPage() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           {doctor.photo_url ? (
-                            <img
+                            <Image
                               className="h-10 w-10 rounded-full object-cover"
                               src={doctor.photo_url}
                               alt={doctor.full_name}
+                              width={40}
+                              height={40}
                             />
                           ) : (
                             <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">

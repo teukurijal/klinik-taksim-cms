@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiArrowLeft, FiEdit, FiPhone, FiMail, FiMapPin, FiUser, FiCalendar } from 'react-icons/fi'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Doctor {
   id: string
@@ -33,11 +34,7 @@ export default function ViewDoctorPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    fetchDoctor()
-  }, [doctorId])
-
-  const fetchDoctor = async () => {
+  const fetchDoctor = useCallback(async () => {
     try {
       const response = await fetch(`/api/doctors/${doctorId}`, {
         credentials: 'include',
@@ -57,7 +54,11 @@ export default function ViewDoctorPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [doctorId])
+
+  useEffect(() => {
+    fetchDoctor()
+  }, [fetchDoctor])
 
   const formatSchedule = (schedule: { [key: string]: { start: string; end: string } | null }) => {
     if (!schedule) return 'No schedule set'
@@ -155,10 +156,12 @@ export default function ViewDoctorPage() {
           <div className="flex items-center space-x-6 mb-8">
             <div className="flex-shrink-0">
               {doctor.photo_url ? (
-                <img
+                <Image
                   className="w-20 h-20 rounded-full object-cover"
                   src={doctor.photo_url}
                   alt={doctor.full_name}
+                  width={80}
+                  height={80}
                 />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">

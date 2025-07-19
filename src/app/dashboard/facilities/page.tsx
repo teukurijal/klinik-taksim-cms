@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiTrash2, FiImage } from 'react-icons/fi'
+import Image from 'next/image'
 
 interface FacilityPhoto {
   id: string
@@ -171,9 +172,11 @@ export default function FacilitiesPage() {
           {facilities.map((facility) => (
             <div key={facility.id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
               <div className="relative group">
-                <img
+                <Image
                   src={facility.image_url}
                   alt={facility.title || 'Facility photo'}
+                  width={400}
+                  height={192}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded-t-lg">

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiArrowLeft } from 'react-icons/fi'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface ScheduleTime {
   start: string
@@ -19,12 +20,12 @@ export default function EditDoctorPage() {
   const router = useRouter()
   const params = useParams()
   const doctorId = params.id as string
-  
+
   const [loading, setLoading] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
   const [error, setError] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  
+
   const [formData, setFormData] = useState({
     full_name: '',
     specialist: '',
@@ -50,11 +51,7 @@ export default function EditDoctorPage() {
     } as DoctorSchedule
   })
 
-  useEffect(() => {
-    fetchDoctor()
-  }, [doctorId])
-
-  const fetchDoctor = async () => {
+  const fetchDoctor = useCallback(async () => {
     try {
       const response = await fetch(`/api/doctors/${doctorId}`, {
         credentials: 'include',
@@ -98,7 +95,11 @@ export default function EditDoctorPage() {
     } finally {
       setFetchLoading(false)
     }
-  }
+  }, [doctorId])
+
+  useEffect(() => {
+    fetchDoctor()
+  }, [fetchDoctor])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -248,8 +249,8 @@ export default function EditDoctorPage() {
         <form onSubmit={handleSubmit} className="p-6 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name *
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Full Name  <span className='text-red-500'> <span className='text-red-500'>*</span></span>
               </label>
               <input
                 type="text"
@@ -262,8 +263,8 @@ export default function EditDoctorPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Specialist *
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Specialist  <span className='text-red-500'>*</span>
               </label>
               <input
                 type="text"
@@ -276,8 +277,8 @@ export default function EditDoctorPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Phone Number
               </label>
               <input
@@ -287,10 +288,10 @@ export default function EditDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-
+            </div> */}
+{/* 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Email
               </label>
               <input
@@ -300,10 +301,10 @@ export default function EditDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Gender
               </label>
               <select
@@ -318,7 +319,7 @@ export default function EditDoctorPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Years of Practice
               </label>
               <input
@@ -331,8 +332,8 @@ export default function EditDoctorPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 STR Number
               </label>
               <input
@@ -345,7 +346,7 @@ export default function EditDoctorPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 SIP Number
               </label>
               <input
@@ -355,10 +356,10 @@ export default function EditDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Clinic Room
               </label>
               <input
@@ -368,10 +369,10 @@ export default function EditDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Status
               </label>
               <select
@@ -387,7 +388,7 @@ export default function EditDoctorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               Education
             </label>
             <textarea
@@ -400,7 +401,7 @@ export default function EditDoctorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               Experience
             </label>
             <textarea
@@ -413,16 +414,18 @@ export default function EditDoctorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               Photo
             </label>
             <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
               <div className="space-y-1 text-center">
                 {formData.photo_url ? (
                   <div className="mb-4">
-                    <img
+                    <Image
                       src={formData.photo_url}
                       alt="Doctor photo"
+                      width={80}
+                      height={80}
                       className="w-20 h-20 rounded-full mx-auto object-cover"
                     />
                   </div>
@@ -435,7 +438,7 @@ export default function EditDoctorPage() {
                     <input
                       type="file"
                       className="sr-only"
-                      accept="image/*"
+                      accept="image/ <span className='text-red-500'>*</span>"
                       onChange={handlePhotoUpload}
                       disabled={uploadingPhoto}
                     />
@@ -447,7 +450,7 @@ export default function EditDoctorPage() {
           </div>
 
           <div className="border-t border-gray-200 pt-8">
-            <label className="block text-sm font-medium text-gray-700 mb-6">
+            <label className="block text-sm font-bold text-gray-700 mb-6">
               Weekly Schedule
             </label>
             <div className="space-y-4 max-h-96 overflow-y-auto">
@@ -458,7 +461,7 @@ export default function EditDoctorPage() {
                     <div className="w-24 text-sm font-medium text-gray-700 capitalize flex-shrink-0">
                       {day}
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
@@ -480,7 +483,7 @@ export default function EditDoctorPage() {
                             className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <label className="text-sm text-gray-600 w-10">End:</label>
                           <input

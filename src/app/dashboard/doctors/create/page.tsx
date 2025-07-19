@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiArrowLeft } from 'react-icons/fi'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function CreateDoctorPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  
+
   const [formData, setFormData] = useState({
     full_name: '',
     specialist: '',
@@ -63,7 +64,7 @@ export default function CreateDoctorPage() {
       ...prev,
       schedule: {
         ...prev.schedule,
-        [day]: prev.schedule[day as keyof typeof prev.schedule].start === 'OFF' 
+        [day]: prev.schedule[day as keyof typeof prev.schedule].start === 'OFF'
           ? { start: '', end: '' }
           : { start: 'OFF', end: 'OFF' }
       }
@@ -163,8 +164,8 @@ export default function CreateDoctorPage() {
         <form onSubmit={handleSubmit} className="p-6 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name *
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Full Name <span className='text-red-500'><span className='text-red-500'>*</span></span>
               </label>
               <input
                 type="text"
@@ -177,8 +178,8 @@ export default function CreateDoctorPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Specialist *
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Specialist <span className='text-red-500'>*</span>
               </label>
               <input
                 type="text"
@@ -191,8 +192,8 @@ export default function CreateDoctorPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Phone Number
               </label>
               <input
@@ -202,10 +203,10 @@ export default function CreateDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-
+            </div> */}
+{/* 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Email
               </label>
               <input
@@ -215,10 +216,10 @@ export default function CreateDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Gender
               </label>
               <select
@@ -233,7 +234,7 @@ export default function CreateDoctorPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Years of Practice
               </label>
               <input
@@ -246,8 +247,8 @@ export default function CreateDoctorPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 STR Number
               </label>
               <input
@@ -257,10 +258,10 @@ export default function CreateDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-
+            </div> */}
+{/* 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 SIP Number
               </label>
               <input
@@ -270,10 +271,10 @@ export default function CreateDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Clinic Room
               </label>
               <input
@@ -283,10 +284,10 @@ export default function CreateDoctorPage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 Status
               </label>
               <select
@@ -302,7 +303,7 @@ export default function CreateDoctorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               Education
             </label>
             <textarea
@@ -315,7 +316,7 @@ export default function CreateDoctorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               Experience
             </label>
             <textarea
@@ -328,16 +329,18 @@ export default function CreateDoctorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               Photo
             </label>
             <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
               <div className="space-y-1 text-center">
                 {formData.photo_url ? (
                   <div className="mb-4">
-                    <img
+                    <Image
                       src={formData.photo_url}
                       alt="Doctor photo"
+                      width={80}
+                      height={80}
                       className="w-20 h-20 rounded-full mx-auto object-cover"
                     />
                   </div>
@@ -371,7 +374,7 @@ export default function CreateDoctorPage() {
                   <div className="w-24 text-sm font-medium text-gray-700 capitalize flex-shrink-0">
                     {day}
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -393,7 +396,7 @@ export default function CreateDoctorPage() {
                           className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <label className="text-sm text-gray-600 w-10">End:</label>
                         <input

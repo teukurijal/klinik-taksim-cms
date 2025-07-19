@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import Link from 'next/link'
+import Image from 'next/image'
 import { FiPlus, FiEdit, FiTrash2, FiEye, FiCalendar } from 'react-icons/fi'
 
 interface Promo {
@@ -132,15 +133,17 @@ export default function PromosPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {promos.map((promo) => (
             <div key={promo.id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-              {promo.image_url && (
+              {/* {promo.image_url && (
                 <div className="w-full h-48 overflow-hidden rounded-t-lg">
-                  <img
-                    src={promo.image_url}
+                  <Image
+                    src={promo?.image_url || ""}
                     alt={promo.title}
+                    width={400}
+                    height={192}
                     className="w-full h-full object-cover"
                   />
                 </div>
-              )}
+              )} */}
               
               <div className="p-6">
                 <div className="flex items-start justify-between mb-2">

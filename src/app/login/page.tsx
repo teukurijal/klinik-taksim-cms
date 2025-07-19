@@ -40,9 +40,11 @@ export default function LoginPage() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4">
-            <img 
+            <Image 
               src="/images/logo_icon.png" 
               alt="Logo" 
+              width={64}
+              height={64}
               className="w-full h-full object-contain"
             />
           </div>
@@ -110,7 +112,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>© 2024 Klinik Taksim Medika. All rights reserved.</p>
+          <p>© 2025 Klinik Taksim Medika. All rights reserved.</p>
         </div>
       </div>
     </div>

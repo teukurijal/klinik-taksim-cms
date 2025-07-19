@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiArrowLeft } from 'react-icons/fi'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function CreatePromoPage() {
   const router = useRouter()
@@ -193,9 +194,11 @@ export default function CreatePromoPage() {
               <div className="space-y-1 text-center">
                 {formData.image_url ? (
                   <div className="mb-4">
-                    <img
+                    <Image
                       src={formData.image_url}
                       alt="Promo image"
+                      width={200}
+                      height={160}
                       className="max-h-40 mx-auto rounded-lg"
                     />
                   </div>

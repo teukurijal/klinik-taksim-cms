@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiTrash2, FiEdit, FiExternalLink, FiImage } from 'react-icons/fi'
+import Image from 'next/image'
 
 interface Partner {
   id: string
@@ -249,9 +250,11 @@ export default function PartnersPage() {
             <div key={partner.id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
               <div className="relative group">
                 <div className="p-4">
-                  <img
+                  <Image
                     src={partner.image_url}
                     alt={partner.name || 'Partner logo'}
+                    width={200}
+                    height={80}
                     className="w-full h-20 object-contain"
                   />
                 </div>
