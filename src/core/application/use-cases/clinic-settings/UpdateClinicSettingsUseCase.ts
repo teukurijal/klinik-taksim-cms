@@ -25,7 +25,12 @@ export class UpdateClinicSettingsUseCase {
         throw new NotFoundError('ClinicSettings', id)
       }
 
-      const updateData: any = {}
+      const updateData: Partial<{
+        clinicName: string;
+        address: string;
+        phone: PhoneNumber | undefined;
+        email: Email | undefined;
+      }> = {}
       
       if (request.clinicName !== undefined) {
         updateData.clinicName = request.clinicName

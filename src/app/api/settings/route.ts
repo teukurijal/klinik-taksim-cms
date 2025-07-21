@@ -39,9 +39,9 @@ async function authenticate(): Promise<boolean> {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Settings are publicly readable - no auth check required for GET
-  return settingsController.getCurrent(request)
+  return settingsController.getCurrent()
 }
 
 export async function POST(request: NextRequest) {

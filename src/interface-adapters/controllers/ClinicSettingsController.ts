@@ -31,7 +31,7 @@ export class ClinicSettingsController {
     }
   }
 
-  async getCurrent(request: NextRequest): Promise<NextResponse> {
+  async getCurrent(): Promise<NextResponse> {
     try {
       console.log('Getting current settings...')
       const useCase = new GetCurrentClinicSettingsUseCase(this.clinicSettingsRepository)
