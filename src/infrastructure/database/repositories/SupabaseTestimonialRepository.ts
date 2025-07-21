@@ -22,6 +22,7 @@ export class SupabaseTestimonialRepository implements TestimonialRepository {
       model.testimonial_text,
       model.photo_url,
       model.patient_category,
+      model.rate,
       new Date(model.created_at),
       new Date(model.updated_at)
     )
@@ -33,6 +34,7 @@ export class SupabaseTestimonialRepository implements TestimonialRepository {
       testimonial_text: testimonial.getTestimonialText(),
       photo_url: testimonial.getPhotoUrl(),
       patient_category: testimonial.getPatientCategory(),
+      rate: testimonial.getRate(),
     }
   }
 

@@ -64,7 +64,7 @@ export default function SettingsPage() {
 
       if (response.ok) {
         setSuccess('Settings updated successfully')
-        setSettings(result.data[0])
+        await fetchSettings()
       } else {
         setError(result.error)
       }

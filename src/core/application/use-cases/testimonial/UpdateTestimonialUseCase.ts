@@ -8,6 +8,7 @@ export interface UpdateTestimonialRequest {
   testimonialText?: string
   photoUrl?: string
   patientCategory?: string
+  rate?: number
 }
 
 export class UpdateTestimonialUseCase {
@@ -26,7 +27,8 @@ export class UpdateTestimonialUseCase {
         name: request.name,
         testimonialText: request.testimonialText,
         photoUrl: request.photoUrl,
-        patientCategory: request.patientCategory
+        patientCategory: request.patientCategory,
+        rate: request.rate
       })
 
       return await this.testimonialRepository.update(testimonialId, existingTestimonial)

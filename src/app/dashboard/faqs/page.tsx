@@ -192,7 +192,7 @@ export default function FAQsPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {index + 1}. {faq.question}
+                      {index + 1}. {faq?.question}
                     </h3>
                     <p className="text-gray-700 leading-relaxed mb-3">
                       {faq.answer}

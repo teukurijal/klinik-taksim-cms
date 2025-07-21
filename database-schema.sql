@@ -55,6 +55,7 @@ CREATE TABLE testimonials (
   photo_url TEXT,
   testimonial_text TEXT NOT NULL,
   patient_category VARCHAR(100),
+  rate INTEGER DEFAULT 5 CHECK (rate >= 1 AND rate <= 5),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

@@ -23,7 +23,8 @@ export class TestimonialController {
         name: body.name,
         testimonialText: body.testimonial_text,
         photoUrl: body.photoUrl,
-        patientCategory: body.patient_category
+        patientCategory: body.patient_category,
+        rate: body.rate
       })
       
       return NextResponse.json({ 
@@ -88,7 +89,8 @@ export class TestimonialController {
         name: body.name,
         testimonialText: body.testimonial_text,
         photoUrl: body.photoUrl,
-        patientCategory: body.patient_category
+        patientCategory: body.patient_category,
+        rate: body.rate
       })
       
       return NextResponse.json({ 
@@ -121,6 +123,7 @@ export class TestimonialController {
       photo_url: testimonial.getPhotoUrl(),
       testimonial_text: testimonial.getTestimonialText(),
       patient_category: testimonial.getPatientCategory(),
+      rate: testimonial.getRate(),
       created_at: testimonial.getCreatedAt().toISOString(),
       updated_at: testimonial.getUpdatedAt().toISOString()
     }

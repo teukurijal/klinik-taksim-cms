@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { Container } from '../../../shared/di/Container'
+import { Container } from '../../../../shared/di/Container'
 
 const container = Container.getInstance()
 const settingsController = container.getClinicSettingsController()
@@ -39,27 +39,24 @@ async function authenticate(): Promise<boolean> {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   // Settings are publicly readable - no auth check required for GET
-  return settingsController.getCurrent(request)
+  const { id } = await params
+  return settingsController.getById(id)
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const isAuthenticated = await authenticate()
   if (!isAuthenticated) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  return settingsController.create(request)
-}
-
-export async function PUT(request: NextRequest) {
-  const isAuthenticated = await authenticate()
-  if (!isAuthenticated) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // For settings, we'll use a fixed ID approach or get the current settings ID
-  // The controller will handle finding the settings record
-  return settingsController.updateCurrent(request)
+  const { id } = await params
+  return settingsController.update(id, request)
 }

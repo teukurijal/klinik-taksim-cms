@@ -8,6 +8,7 @@ export interface CreateTestimonialRequest {
   testimonialText: string
   photoUrl?: string
   patientCategory?: string
+  rate?: number
 }
 
 export class CreateTestimonialUseCase {
@@ -22,7 +23,8 @@ export class CreateTestimonialUseCase {
         request.name,
         request.testimonialText,
         request.photoUrl,
-        request.patientCategory
+        request.patientCategory,
+        request.rate || 5
       )
 
       return await this.testimonialRepository.save(testimonial)

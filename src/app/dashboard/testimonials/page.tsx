@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import { StarRating } from '@/components/ui/star-rating'
 import { FiPlus, FiEdit, FiTrash2, FiUser } from 'react-icons/fi'
 
 interface Testimonial {
@@ -10,6 +11,7 @@ interface Testimonial {
   photo_url?: string
   testimonial_text: string
   patient_category?: string
+  rate: number
   created_at: string
 }
 
@@ -19,11 +21,13 @@ export default function TestimonialsPage() {
   const [error, setError] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const formRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState({
     name: '',
     testimonial_text: '',
     patient_category: '',
-    photo_url: ''
+    photo_url: '',
+    rate: 5
   })
 
   useEffect(() => {
@@ -64,12 +68,8 @@ export default function TestimonialsPage() {
       const result = await response.json()
 
       if (response.ok) {
-        if (editingId) {
-          setTestimonials(testimonials.map(t => t.id === editingId ? result.data[0] : t))
-        } else {
-          setTestimonials([result.data[0], ...testimonials])
-        }
         resetForm()
+        await fetchTestimonials()
       } else {
         setError(result.error)
       }
@@ -95,7 +95,7 @@ export default function TestimonialsPage() {
   }
 
   const resetForm = () => {
-    setFormData({ name: '', testimonial_text: '', patient_category: '', photo_url: '' })
+    setFormData({ name: '', testimonial_text: '', patient_category: '', photo_url: '', rate: 5 })
     setShowForm(false)
     setEditingId(null)
   }
@@ -105,10 +105,15 @@ export default function TestimonialsPage() {
       name: testimonial?.name,
       testimonial_text: testimonial?.testimonial_text,
       patient_category: testimonial?.patient_category || '',
-      photo_url: testimonial?.photo_url || ''
+      photo_url: testimonial?.photo_url || '',
+      rate: testimonial?.rate || 5
     })
     setEditingId(testimonial?.id)
     setShowForm(true)
+    
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
   }
 
   if (loading) {
@@ -151,7 +156,7 @@ export default function TestimonialsPage() {
       )}
 
       {showForm && (
-        <div className="bg-white rounded-lg shadow mb-6">
+        <div ref={formRef} className="bg-white rounded-lg shadow mb-6">
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
@@ -178,6 +183,13 @@ export default function TestimonialsPage() {
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Rating</label>
+              <StarRating 
+                value={formData.rate} 
+                onChange={(rating) => setFormData({ ...formData, rate: rating })}
+              />
+            </div>
             <div className="flex justify-end space-x-2">
               <button type="button" onClick={resetForm} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
@@ -205,10 +217,13 @@ export default function TestimonialsPage() {
                   {testimonial?.patient_category && (
                     <p className="text-sm text-blue-600 mb-2">{testimonial?.patient_category}</p>
                   )}
-                  <p className="text-gray-700 leading-relaxed">{testimonial?.testimonial_text}</p>
-                  <p className="text-xs text-gray-400 mt-2">
-                    {new Date(testimonial?.created_at).toLocaleDateString()}
-                  </p>
+                  <p className="text-gray-700 leading-relaxed mb-3">{testimonial?.testimonial_text}</p>
+                  <div className="flex items-center justify-between">
+                    <StarRating value={testimonial?.rate || 5} readonly size="sm" />
+                    <p className="text-xs text-gray-400">
+                      {new Date(testimonial?.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className="flex space-x-2">
