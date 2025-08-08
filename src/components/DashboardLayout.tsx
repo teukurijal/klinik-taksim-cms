@@ -17,6 +17,7 @@ import {
   FiLogOut,
   FiMenu,
   FiX,
+  FiFileText,
 } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -30,6 +31,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: FiHome },
   { name: 'Doctors', href: '/dashboard/doctors', icon: FiUsers },
+  { name: 'Articles', href: '/dashboard/articles', icon: FiFileText },
   { name: 'Promos', href: '/dashboard/promos', icon: FiTag },
   { name: 'Facilities', href: '/dashboard/facilities', icon: FiCamera },
   { name: 'Testimonials', href: '/dashboard/testimonials', icon: FiMessageSquare },

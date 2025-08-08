@@ -6,6 +6,7 @@ export async function POST() {
     
     const seeders = [
       { name: 'Doctors', endpoint: '/api/seed/doctors' },
+      { name: 'Articles', endpoint: '/api/seed/articles' },
       { name: 'Promos', endpoint: '/api/seed/promos' },
       { name: 'Facilities', endpoint: '/api/seed/facilities' },
       { name: 'Testimonials', endpoint: '/api/seed/testimonials' },

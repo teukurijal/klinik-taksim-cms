@@ -4,6 +4,7 @@ import { FacilityPhotoRepository } from '../../core/domain/repositories/Facility
 import { TestimonialRepository } from '../../core/domain/repositories/TestimonialRepository'
 import { FAQRepository } from '../../core/domain/repositories/FAQRepository'
 import { ClinicSettingsRepository } from '../../core/domain/repositories/ClinicSettingsRepository'
+import { ArticleRepository } from '../../core/domain/repositories/ArticleRepository'
 
 import { SupabaseDoctorRepository } from '../../infrastructure/database/repositories/SupabaseDoctorRepository'
 import { SupabasePromoRepository } from '../../infrastructure/database/repositories/SupabasePromoRepository'
@@ -11,6 +12,7 @@ import { SupabaseFacilityPhotoRepository } from '../../infrastructure/database/r
 import { SupabaseTestimonialRepository } from '../../infrastructure/database/repositories/SupabaseTestimonialRepository'
 import { SupabaseFAQRepository } from '../../infrastructure/database/repositories/SupabaseFAQRepository'
 import { SupabaseClinicSettingsRepository } from '../../infrastructure/database/repositories/SupabaseClinicSettingsRepository'
+import { SupabaseArticleRepository } from '../../infrastructure/database/repositories/SupabaseArticleRepository'
 
 import { DoctorController } from '../../interface-adapters/controllers/DoctorController'
 import { PromoController } from '../../interface-adapters/controllers/PromoController'
@@ -18,6 +20,7 @@ import { FacilityPhotoController } from '../../interface-adapters/controllers/Fa
 import { TestimonialController } from '../../interface-adapters/controllers/TestimonialController'
 import { FAQController } from '../../interface-adapters/controllers/FAQController'
 import { ClinicSettingsController } from '../../interface-adapters/controllers/ClinicSettingsController'
+import { ArticleController } from '../../interface-adapters/controllers/ArticleController'
 
 export class Container {
   private static instance: Container
@@ -43,6 +46,7 @@ export class Container {
     this.repositories.set('TestimonialRepository', new SupabaseTestimonialRepository())
     this.repositories.set('FAQRepository', new SupabaseFAQRepository())
     this.repositories.set('ClinicSettingsRepository', new SupabaseClinicSettingsRepository())
+    this.repositories.set('ArticleRepository', new SupabaseArticleRepository())
   }
 
   private setupControllers(): void {
@@ -63,6 +67,10 @@ export class Container {
     ))
     this.controllers.set('ClinicSettingsController', new ClinicSettingsController(
       this.repositories.get('ClinicSettingsRepository') as ClinicSettingsRepository
+    ))
+    
+    this.controllers.set('ArticleController', new ArticleController(
+      this.repositories.get('ArticleRepository') as ArticleRepository
     ))
   }
 
@@ -112,5 +120,13 @@ export class Container {
 
   getClinicSettingsController(): ClinicSettingsController {
     return this.controllers.get('ClinicSettingsController') as ClinicSettingsController
+  }
+
+  getArticleRepository(): ArticleRepository {
+    return this.repositories.get('ArticleRepository') as ArticleRepository
+  }
+
+  getArticleController(): ArticleController {
+    return this.controllers.get('ArticleController') as ArticleController
   }
 }
