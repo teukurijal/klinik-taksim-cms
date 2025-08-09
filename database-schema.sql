@@ -79,6 +79,23 @@ CREATE TABLE partners (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create polyclinics table
+CREATE TABLE polyclinics (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  head VARCHAR(255) NOT NULL,
+  location VARCHAR(500),
+  phone_number VARCHAR(20),
+  email VARCHAR(255),
+  working_hours JSONB,
+  capacity INTEGER,
+  services TEXT[],
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 
 -- Create articles table
 CREATE TABLE articles (
@@ -128,6 +145,7 @@ CREATE TRIGGER update_facility_photos_updated_at BEFORE UPDATE ON facility_photo
 CREATE TRIGGER update_testimonials_updated_at BEFORE UPDATE ON testimonials FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_faqs_updated_at BEFORE UPDATE ON faqs FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_partners_updated_at BEFORE UPDATE ON partners FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_polyclinics_updated_at BEFORE UPDATE ON polyclinics FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_articles_updated_at BEFORE UPDATE ON articles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_clinic_settings_updated_at BEFORE UPDATE ON clinic_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -138,6 +156,7 @@ ALTER TABLE facility_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE faqs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE partners ENABLE ROW LEVEL SECURITY;
+ALTER TABLE polyclinics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clinic_settings ENABLE ROW LEVEL SECURITY;
 
@@ -148,6 +167,7 @@ CREATE POLICY "Admin access" ON facility_photos FOR ALL USING (auth.jwt() ->> 'r
 CREATE POLICY "Admin access" ON testimonials FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
 CREATE POLICY "Admin access" ON faqs FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
 CREATE POLICY "Admin access" ON partners FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY "Admin access" ON polyclinics FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
 CREATE POLICY "Admin access" ON articles FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
 CREATE POLICY "Admin access" ON clinic_settings FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
 
@@ -158,6 +178,7 @@ CREATE POLICY "Public read facility_photos" ON facility_photos FOR SELECT USING 
 CREATE POLICY "Public read testimonials" ON testimonials FOR SELECT USING (true);
 CREATE POLICY "Public read faqs" ON faqs FOR SELECT USING (true);
 CREATE POLICY "Public read partners" ON partners FOR SELECT USING (true);
+CREATE POLICY "Public read polyclinics" ON polyclinics FOR SELECT USING (status = 'active');
 CREATE POLICY "Public read articles" ON articles FOR SELECT USING (status = 'published');
 CREATE POLICY "Public read clinic_settings" ON clinic_settings FOR SELECT USING (true);
 
