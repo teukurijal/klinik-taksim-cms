@@ -6,6 +6,14 @@ import Link from 'next/link'
 import { FiPlus, FiEdit, FiTrash2, FiEye, FiUsers } from 'react-icons/fi'
 import { apiGet, apiDelete } from '@/utils/api'
 
+interface WorkingHours {
+  [key: string]: {
+    start: string
+    end: string
+    available: boolean
+  }
+}
+
 interface PolyClinic {
   id: string
   name: string
@@ -15,23 +23,33 @@ interface PolyClinic {
   location?: string
   phone_number?: string
   email?: string
-  working_hours?: {
-    [key: string]: {
-      start: string
-      end: string
-      available: boolean
-    }
-  }
+  working_hours?: WorkingHours | string | null
   capacity?: number
   services?: string[]
   created_at: string
 }
 
-const formatWorkingHours = (workingHours?: { [key: string]: { start: string; end: string; available: boolean } }) => {
+const formatWorkingHours = (workingHours?: WorkingHours | string | null) => {
   if (!workingHours) return 'Not specified'
   
-  const availableDays = Object.entries(workingHours)
-    .filter(([_, hours]) => hours.available && hours.start && hours.end)
+  // Handle if working hours is a string (parse it)
+  let parsedHours: WorkingHours | null = null
+  if (typeof workingHours === 'string') {
+    try {
+      parsedHours = JSON.parse(workingHours)
+    } catch {
+      return 'Not specified'
+    }
+  } else if (typeof workingHours === 'object' && workingHours !== null) {
+    parsedHours = workingHours
+  }
+  
+  if (!parsedHours || typeof parsedHours !== 'object') {
+    return 'Not specified'
+  }
+  
+  const availableDays = Object.entries(parsedHours)
+    .filter(([, hours]) => hours && hours.available && hours.start && hours.end)
     .map(([day, hours]) => `${day.charAt(0).toUpperCase() + day.slice(1)}: ${hours.start}-${hours.end}`)
   
   if (availableDays.length === 0) return 'Not specified'

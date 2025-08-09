@@ -7,6 +7,14 @@ import { FiSave, FiX } from 'react-icons/fi'
 import { apiGet, apiPut } from '@/utils/api'
 import Link from 'next/link'
 
+interface WorkingHours {
+  [key: string]: {
+    start: string
+    end: string
+    available: boolean
+  }
+}
+
 interface PolyClinic {
   id: string
   name: string
@@ -16,15 +24,59 @@ interface PolyClinic {
   location?: string
   phone_number?: string
   email?: string
-  working_hours?: {
-    [key: string]: {
-      start: string
-      end: string
-      available: boolean
-    }
-  }
+  working_hours?: WorkingHours | string | null
   capacity?: number
   services?: string[]
+}
+
+const parseWorkingHours = (workingHours: WorkingHours | string | null): WorkingHours => {
+  const defaultHours: WorkingHours = {
+    monday: { start: '', end: '', available: true },
+    tuesday: { start: '', end: '', available: true },
+    wednesday: { start: '', end: '', available: true },
+    thursday: { start: '', end: '', available: true },
+    friday: { start: '', end: '', available: true },
+    saturday: { start: '', end: '', available: true },
+    sunday: { start: '', end: '', available: true }
+  }
+
+  if (!workingHours) return defaultHours
+
+  // If it's a string, try to parse it
+  if (typeof workingHours === 'string') {
+    try {
+      const parsed = JSON.parse(workingHours)
+      if (typeof parsed === 'object' && parsed !== null) {
+        // Merge with defaults to ensure all days exist
+        return {
+          monday: parsed.monday || defaultHours.monday,
+          tuesday: parsed.tuesday || defaultHours.tuesday,
+          wednesday: parsed.wednesday || defaultHours.wednesday,
+          thursday: parsed.thursday || defaultHours.thursday,
+          friday: parsed.friday || defaultHours.friday,
+          saturday: parsed.saturday || defaultHours.saturday,
+          sunday: parsed.sunday || defaultHours.sunday
+        }
+      }
+    } catch {
+      return defaultHours
+    }
+  }
+
+  // If it's already an object, merge with defaults
+  if (typeof workingHours === 'object' && workingHours !== null) {
+    return {
+      monday: workingHours.monday || defaultHours.monday,
+      tuesday: workingHours.tuesday || defaultHours.tuesday,
+      wednesday: workingHours.wednesday || defaultHours.wednesday,
+      thursday: workingHours.thursday || defaultHours.thursday,
+      friday: workingHours.friday || defaultHours.friday,
+      saturday: workingHours.saturday || defaultHours.saturday,
+      sunday: workingHours.sunday || defaultHours.sunday
+    }
+  }
+
+  return defaultHours
 }
 
 export default function EditPolyClinicPage() {
@@ -41,15 +93,7 @@ export default function EditPolyClinicPage() {
     location: '',
     phone_number: '',
     email: '',
-    working_hours: {
-      monday: { start: '', end: '', available: true },
-      tuesday: { start: '', end: '', available: true },
-      wednesday: { start: '', end: '', available: true },
-      thursday: { start: '', end: '', available: true },
-      friday: { start: '', end: '', available: true },
-      saturday: { start: '', end: '', available: true },
-      sunday: { start: '', end: '', available: true }
-    },
+    working_hours: parseWorkingHours(null),
     capacity: '',
     services: ['']
   })
@@ -68,23 +112,7 @@ export default function EditPolyClinicPage() {
           location: pc.location || '',
           phone_number: pc.phone_number || '',
           email: pc.email || '',
-          working_hours: pc.working_hours ? {
-            monday: pc.working_hours.monday || { start: '', end: '', available: true },
-            tuesday: pc.working_hours.tuesday || { start: '', end: '', available: true },
-            wednesday: pc.working_hours.wednesday || { start: '', end: '', available: true },
-            thursday: pc.working_hours.thursday || { start: '', end: '', available: true },
-            friday: pc.working_hours.friday || { start: '', end: '', available: true },
-            saturday: pc.working_hours.saturday || { start: '', end: '', available: true },
-            sunday: pc.working_hours.sunday || { start: '', end: '', available: true }
-          } : {
-            monday: { start: '', end: '', available: true },
-            tuesday: { start: '', end: '', available: true },
-            wednesday: { start: '', end: '', available: true },
-            thursday: { start: '', end: '', available: true },
-            friday: { start: '', end: '', available: true },
-            saturday: { start: '', end: '', available: true },
-            sunday: { start: '', end: '', available: true }
-          },
+          working_hours: parseWorkingHours(pc.working_hours || null),
           capacity: pc.capacity ? pc.capacity.toString() : '',
           services: pc.services && pc.services.length > 0 ? pc.services : ['']
         })

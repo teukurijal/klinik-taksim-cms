@@ -7,6 +7,14 @@ import Link from 'next/link'
 import { FiEdit, FiArrowLeft, FiUsers, FiMapPin, FiPhone, FiMail, FiClock, FiList } from 'react-icons/fi'
 import { apiGet } from '@/utils/api'
 
+interface WorkingHours {
+  [key: string]: {
+    start: string
+    end: string
+    available: boolean
+  }
+}
+
 interface PolyClinic {
   id: string
   name: string
@@ -16,11 +24,54 @@ interface PolyClinic {
   location?: string
   phone_number?: string
   email?: string
-  working_hours?: string
+  working_hours?: WorkingHours | string | null
   capacity?: number
   services?: string[]
   created_at: string
   updated_at: string
+}
+
+const formatWorkingHours = (workingHours: WorkingHours | string | null) => {
+  if (!workingHours) return []
+  
+  // Handle if working hours is a string (parse it)
+  let parsedHours = workingHours
+  if (typeof workingHours === 'string') {
+    try {
+      parsedHours = JSON.parse(workingHours)
+    } catch {
+      // If it's just a plain string, return empty array
+      return []
+    }
+  }
+  
+  // Ensure we have an object
+  if (typeof parsedHours !== 'object' || parsedHours === null) {
+    return []
+  }
+  
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  
+  return days.map((day, index) => {
+    const daySchedule = parsedHours[day]
+    
+    // Check if day schedule exists and has the expected structure
+    if (!daySchedule || 
+        typeof daySchedule !== 'object' || 
+        !daySchedule.available || 
+        !daySchedule.start || 
+        !daySchedule.end) {
+      return null
+    }
+    
+    return (
+      <div key={day} className="flex justify-between py-1">
+        <span className="font-medium">{dayNames[index]}:</span>
+        <span>{daySchedule.start} - {daySchedule.end}</span>
+      </div>
+    )
+  }).filter(Boolean)
 }
 
 export default function PolyClinicDetailPage() {
@@ -140,15 +191,6 @@ export default function PolyClinicDetailPage() {
                   </>
                 )}
 
-                {polyClinic.working_hours && (
-                  <>
-                    <div className="flex items-center space-x-2">
-                      <FiClock className="w-4 h-4 text-gray-400" />
-                      <label className="block text-sm font-medium text-gray-500">Working Hours</label>
-                    </div>
-                    <p className="ml-6 text-sm text-gray-900">{polyClinic.working_hours}</p>
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -213,6 +255,26 @@ export default function PolyClinicDetailPage() {
               </div>
             </div>
           </div>
+
+          {polyClinic.working_hours && (
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <FiClock className="w-5 h-5 mr-2" />
+                  Working Hours
+                </h2>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  {formatWorkingHours(polyClinic.working_hours).length > 0 ? (
+                    <div className="space-y-1">
+                      {formatWorkingHours(polyClinic.working_hours)}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">No working hours available</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="bg-white rounded-lg shadow">
             <div className="p-6">
