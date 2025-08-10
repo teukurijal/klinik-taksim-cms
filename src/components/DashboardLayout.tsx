@@ -19,6 +19,7 @@ import {
   FiX,
   FiFileText,
   FiGrid,
+  FiImage,
 } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -38,7 +39,7 @@ const menuItems: MenuItem[] = [
   { name: 'Facilities', href: '/dashboard/facilities', icon: FiCamera },
   { name: 'Testimonials', href: '/dashboard/testimonials', icon: FiMessageSquare },
   { name: 'FAQ', href: '/dashboard/faqs', icon: FiHelpCircle },
-  // { name: 'Partners', href: '/dashboard/partners', icon: FiImage },
+  { name: 'Partners', href: '/dashboard/partners', icon: FiImage },
   { name: 'Settings', href: '/dashboard/settings', icon: FiSettings },
 ]
 

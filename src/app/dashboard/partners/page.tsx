@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { FiUpload, FiTrash2, FiEdit, FiExternalLink, FiImage } from 'react-icons/fi'
-import Image from 'next/image'
 
 interface Partner {
   id: string
@@ -25,10 +24,17 @@ export default function PartnersPage() {
     link: '',
     image_url: ''
   })
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchPartners()
   }, [])
+
+  useEffect(() => {
+    if (partners.length > 0) {
+      console.log('Partners loaded:', partners.map(p => ({ id: p.id, name: p.name, image_url: p.image_url })));
+    }
+  }, [partners])
 
   const fetchPartners = async () => {
     try {
@@ -66,7 +72,7 @@ export default function PartnersPage() {
 
       const uploadResult = await uploadResponse.json()
 
-      if (uploadResponse.ok) {
+      if (uploadResponse.ok && uploadResult.data?.url) {
         const response = await fetch('/api/partners', {
           method: 'POST',
           headers: {
@@ -81,14 +87,23 @@ export default function PartnersPage() {
         const result = await response.json()
 
         if (response.ok) {
-          setPartners([result.data[0], ...partners])
+          console.log('Partner creation result:', result)
+          // The API returns { data: partner, success: true }
+          const newPartner = result.data
+          if (newPartner && newPartner.id && newPartner.image_url) {
+            setPartners([newPartner, ...partners])
+          } else {
+            console.error('Invalid partner data structure:', result)
+            setError('Invalid response from server')
+          }
         } else {
-          setError(result.error)
+          setError(result.error || 'Failed to create partner')
         }
       } else {
-        setError(uploadResult.error)
+        setError(uploadResult.error || 'Failed to upload image to storage')
       }
-    } catch {
+    } catch (error) {
+      console.error('Upload error:', error)
       setError('Failed to upload partner logo')
     } finally {
       setUploading(false)
@@ -151,22 +166,6 @@ export default function PartnersPage() {
     setShowForm(true)
   }
 
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-4">
-                <div className="h-20 bg-gray-200 rounded"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </DashboardLayout>
-    )
-  }
 
   return (
     <DashboardLayout>
@@ -238,7 +237,20 @@ export default function PartnersPage() {
         </div>
       </div>
 
-      {partners.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg shadow animate-pulse">
+              <div className="p-4">
+                <div className="h-20 bg-gray-200 rounded"></div>
+              </div>
+              <div className="px-3 pb-3">
+                <div className="h-3 bg-gray-200 rounded w-3/4 mx-auto"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : partners.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <FiImage className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <div className="text-gray-500 mb-4">No partners found</div>
@@ -249,16 +261,33 @@ export default function PartnersPage() {
           {partners.map((partner) => (
             <div key={partner.id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
               <div className="relative group">
-                <div className="p-4">
-                  <Image
-                    src={partner.image_url}
-                    alt={partner.name || 'Partner logo'}
-                    width={200}
-                    height={80}
-                    className="w-full h-20 object-contain"
-                  />
+                <div className="p-4 flex items-center justify-center h-24">
+                  {partner.image_url && !imageErrors.has(partner.id) ? (
+                    <img
+                      src={partner.image_url}
+                      alt={partner.name || 'Partner logo'}
+                      className="w-full h-20 object-contain rounded"
+                      onError={(e) => {
+                        console.error('Failed to load image:', partner.image_url);
+                        setImageErrors(prev => new Set(prev).add(partner.id));
+                        e.currentTarget.style.display = 'none';
+                      }}
+                      onLoad={() => {
+                        console.log('Image loaded successfully:', partner.image_url);
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-20 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                      <div className="text-center">
+                        <FiImage className="w-8 h-8 text-gray-400 mx-auto mb-1" />
+                        <span className="text-xs text-gray-400">
+                          {partner.image_url ? 'Failed to load' : 'No Image'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded-lg">
+                <div >
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
                     <button
                       onClick={() => editPartner(partner)}

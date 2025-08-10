@@ -22,6 +22,10 @@ const options: swaggerJSDoc.Options = {
       {
         name: 'Doctors',
         description: 'Operations related to doctors'
+      },
+      {
+        name: 'Partners',
+        description: 'Operations related to clinic partners'
       }
     ]
   },

@@ -1,45 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { Container } from '../../../shared/di/Container'
 
-export async function GET() {
-  try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-          set(name: string, value: string, options) {
-            cookieStore.set({ name, value, ...options })
-          },
-          remove(name: string, options) {
-            cookieStore.set({ name, value: '', ...options })
-          },
-        },
-      }
-    )
+const container = Container.getInstance()
+const partnerController = container.getPartnerController()
 
-    // Partners are publicly readable - no auth check required for GET
-    const { data, error } = await supabase
-      .from('partners')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ data })
-  } catch {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
-
-export async function POST(request: NextRequest) {
+async function authenticate(): Promise<boolean> {
   try {
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -61,23 +28,22 @@ export async function POST(request: NextRequest) {
     )
 
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
-    
-    const { data, error } = await supabase
-      .from('partners')
-      .insert([body])
-      .select()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ data })
+    return !!session
   } catch {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return false
   }
+}
+
+export async function GET() {
+  // Partners are publicly readable - no auth check required for GET
+  return partnerController.getAll()
+}
+
+export async function POST(request: NextRequest) {
+  const isAuthenticated = await authenticate()
+  if (!isAuthenticated) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  return partnerController.create(request)
 }

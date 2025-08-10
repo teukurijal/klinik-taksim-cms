@@ -6,6 +6,7 @@ import { FAQRepository } from '../../core/domain/repositories/FAQRepository'
 import { ClinicSettingsRepository } from '../../core/domain/repositories/ClinicSettingsRepository'
 import { ArticleRepository } from '../../core/domain/repositories/ArticleRepository'
 import { PolyClinicRepository } from '../../core/domain/repositories/PolyClinicRepository'
+import { PartnerRepository } from '../../core/domain/repositories/PartnerRepository'
 
 import { SupabaseDoctorRepository } from '../../infrastructure/database/repositories/SupabaseDoctorRepository'
 import { SupabasePromoRepository } from '../../infrastructure/database/repositories/SupabasePromoRepository'
@@ -15,6 +16,7 @@ import { SupabaseFAQRepository } from '../../infrastructure/database/repositorie
 import { SupabaseClinicSettingsRepository } from '../../infrastructure/database/repositories/SupabaseClinicSettingsRepository'
 import { SupabaseArticleRepository } from '../../infrastructure/database/repositories/SupabaseArticleRepository'
 import { SupabasePolyClinicRepository } from '../../infrastructure/database/repositories/SupabasePolyClinicRepository'
+import { SupabasePartnerRepository } from '../../infrastructure/database/repositories/SupabasePartnerRepository'
 
 import { DoctorController } from '../../interface-adapters/controllers/DoctorController'
 import { PromoController } from '../../interface-adapters/controllers/PromoController'
@@ -24,6 +26,7 @@ import { FAQController } from '../../interface-adapters/controllers/FAQControlle
 import { ClinicSettingsController } from '../../interface-adapters/controllers/ClinicSettingsController'
 import { ArticleController } from '../../interface-adapters/controllers/ArticleController'
 import { PolyClinicController } from '../../interface-adapters/controllers/PolyClinicController'
+import { PartnerController } from '../../interface-adapters/controllers/PartnerController'
 
 import { CreatePolyClinicUseCase } from '../../core/application/use-cases/polyclinic/CreatePolyClinicUseCase'
 import { GetPolyClinicUseCase } from '../../core/application/use-cases/polyclinic/GetPolyClinicUseCase'
@@ -57,6 +60,7 @@ export class Container {
     this.repositories.set('ClinicSettingsRepository', new SupabaseClinicSettingsRepository())
     this.repositories.set('ArticleRepository', new SupabaseArticleRepository())
     this.repositories.set('PolyClinicRepository', new SupabasePolyClinicRepository())
+    this.repositories.set('PartnerRepository', new SupabasePartnerRepository())
   }
 
   private setupControllers(): void {
@@ -90,6 +94,10 @@ export class Container {
       new GetAllPolyClinicsUseCase(polyClinicRepository),
       new UpdatePolyClinicUseCase(polyClinicRepository),
       new DeletePolyClinicUseCase(polyClinicRepository)
+    ))
+    
+    this.controllers.set('PartnerController', new PartnerController(
+      this.repositories.get('PartnerRepository') as PartnerRepository
     ))
   }
 
@@ -155,5 +163,13 @@ export class Container {
 
   getPolyClinicController(): PolyClinicController {
     return this.controllers.get('PolyClinicController') as PolyClinicController
+  }
+
+  getPartnerRepository(): PartnerRepository {
+    return this.repositories.get('PartnerRepository') as PartnerRepository
+  }
+
+  getPartnerController(): PartnerController {
+    return this.controllers.get('PartnerController') as PartnerController
   }
 }
